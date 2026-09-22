@@ -6,9 +6,10 @@ import {
   tierLabel,
   type DifficultyTier,
 } from '@/features/word/lib/difficultyTier';
+import type { WordDifficultyFilter } from '@/features/word/lib/wordSearch';
 import { useTheme } from '@/shared/theme';
 
-export type WordDifficultyFilterKey = DifficultyTier | 'ALL';
+export type WordDifficultyFilterKey = WordDifficultyFilter;
 
 /** '전체'는 난이도가 아니라 해제 버튼이라 tier 가 없다 — 색도 그래서 갈린다 */
 const FILTERS: { key: WordDifficultyFilterKey; label: string; tier: DifficultyTier | null }[] = [

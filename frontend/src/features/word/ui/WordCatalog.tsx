@@ -4,9 +4,14 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
 
 import { difficultyTier } from '@/features/word/lib/difficultyTier';
-import { groupByChosung, type WordCategoryFilter } from '@/features/word/lib/wordSearch';
+import {
+  filterByDifficulty,
+  groupByChosung,
+  type WordCategoryFilter,
+} from '@/features/word/lib/wordSearch';
 import { useWords } from '@/features/word/model/useWords';
 import { useWordSearch } from '@/features/word/model/useWordSearch';
+import type { DifficultyTier } from '@/features/word/lib/difficultyTier';
 import type { WordCategory, WordListItem } from '@/features/word/model/types';
 import { CategoryFilterBar } from '@/features/word/ui/CategoryFilterBar';
 import {
@@ -28,10 +33,11 @@ type WordCatalogProps = {
   /**
    * 단어를 눌렀을 때의 이동. 부모·아이 라우트 그룹에 같은 `/word/[wordId]` 경로가 있어서
    * 어느 그룹의 상세로 갈지는 화면(라우트)이 정한다 — 그룹을 안 적으면 아이 쪽으로 간다.
-   * category 는 지금 보고 있던 카테고리 필터 — 상세의 이전/다음이 이 범위 안에서 돌게
-   * 라우트 파라미터로 넘긴다 (전체·검색 중이면 undefined).
+   * category·difficulty 는 지금 걸려 있는 필터 — 상세의 이전/다음이 목록에서 보던 그
+   * 범위와 순서를 그대로 돌게 라우트 파라미터로 넘긴다 (전체면 undefined).
+   * 검색 중이면 카테고리를 넘기지 않는다 — 검색 API 가 카테고리를 모른다.
    */
-  onSelectWord: (wordId: number, category?: WordCategory) => void;
+  onSelectWord: (wordId: number, category?: WordCategory, difficulty?: DifficultyTier) => void;
 };
 
 /**
@@ -102,10 +108,7 @@ export function WordCatalog({ onSelectWord }: WordCatalogProps) {
   // 검색 응답에도 난이도는 있어서(WordSearchSummary) 이 필터는 검색 중에도 그대로 돈다 —
   // 카테고리 필터와 달리 비활성화하지 않는다.
   const words: WordListItem[] = useMemo(
-    () =>
-      effectiveDifficulty === 'ALL'
-        ? unfiltered
-        : unfiltered.filter((w) => difficultyTier(w.difficultyLevel) === effectiveDifficulty),
+    () => filterByDifficulty(unfiltered, effectiveDifficulty),
     [unfiltered, effectiveDifficulty],
   );
   const isPending = isSearching
@@ -220,7 +223,11 @@ export function WordCatalog({ onSelectWord }: WordCatalogProps) {
             <WordListRow
               word={item}
               onPress={() =>
-                onSelectWord(item.wordId, isSearching || category === 'ALL' ? undefined : category)
+                onSelectWord(
+                  item.wordId,
+                  isSearching || category === 'ALL' ? undefined : category,
+                  effectiveDifficulty === 'ALL' ? undefined : effectiveDifficulty,
+                )
               }
             />
           )}

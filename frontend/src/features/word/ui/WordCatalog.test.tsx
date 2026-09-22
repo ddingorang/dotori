@@ -42,8 +42,8 @@ it('단어를 누르면 화면이 넘겨 준 이동 함수에 wordId 를 전달�
 
   fireEvent.press(await screen.findByText('중앙은행'));
 
-  // 전체 목록에서는 상세로 넘길 카테고리 범위가 없다
-  expect(onSelectWord).toHaveBeenCalledWith(5, undefined);
+  // 전체 목록에서는 상세로 넘길 필터 범위가 없다 (카테고리·난이도 둘 다)
+  expect(onSelectWord).toHaveBeenCalledWith(5, undefined, undefined);
 });
 
 it('카테고리 필터를 고른 채 단어를 누르면 카테고리도 함께 전달한다 — 상세의 이전/다음 범위가 된다', async () => {
@@ -69,7 +69,7 @@ it('카테고리 필터를 고른 채 단어를 누르면 카테고리도 함께
   fireEvent.press(screen.getByText('저축'));
   fireEvent.press(await screen.findByText('적금'));
 
-  expect(onSelectWord).toHaveBeenCalledWith(7, 'SAVINGS');
+  expect(onSelectWord).toHaveBeenCalledWith(7, 'SAVINGS', undefined);
 });
 
 it('이미 불러온 단어를 검색하면 서버 응답을 기다리지 않고 바로 보여준다', async () => {
@@ -230,4 +230,23 @@ it('남은 페이지가 있으면 스크롤 없이 이어 받는다 — 초성 �
   // 스크롤(onEndReached) 없이도 2페이지가 따라 들어와야 한다
   expect(await screen.findByText('환율')).toBeTruthy();
   expect(wordApi.getWords).toHaveBeenCalledTimes(2);
+});
+
+it('난이도 필터를 건 채 단어를 누르면 난이도도 함께 전달한다 — 화살표가 같은 범위를 돈다', async () => {
+  jest.mocked(wordApi.getWords).mockResolvedValue({
+    words: [
+      { wordId: 1, word: '가격', difficultyLevel: 1, category: 'CONSUMPTION' },
+      { wordId: 2, word: '금리', difficultyLevel: 3, category: 'BANKING' },
+    ],
+    page: 0,
+    totalPages: 1,
+  });
+  await show();
+  await screen.findByText('가격');
+
+  fireEvent.press(screen.getByText('초급 1'));
+  await waitFor(() => expect(screen.queryByText('금리')).toBeNull());
+  fireEvent.press(screen.getByText('가격'));
+
+  expect(onSelectWord).toHaveBeenCalledWith(1, undefined, 'BEGINNER');
 });

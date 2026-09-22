@@ -30,11 +30,20 @@ const DETAILS: Record<number, WordDetailInfo> = {
   },
 };
 
-async function show(props: { wordId: number; category?: 'SAVINGS' }) {
+async function show(props: {
+  wordId: number;
+  category?: 'SAVINGS';
+  difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+}) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
   return render(
     <QueryClientProvider client={client}>
-      <WordDetail wordId={props.wordId} category={props.category} onBack={jest.fn()} />
+      <WordDetail
+        wordId={props.wordId}
+        category={props.category}
+        difficulty={props.difficulty}
+        onBack={jest.fn()}
+      />
     </QueryClientProvider>,
   );
 }
@@ -91,4 +100,46 @@ it('이웃이 없으면 이전/다음 버튼이 눌리지 않는다', async () =
 
   expect(screen.getByLabelText('이전 단어').props.accessibilityState?.disabled).toBe(true);
   expect(screen.getByLabelText('다음 단어').props.accessibilityState?.disabled).toBe(true);
+});
+
+describe('이전/다음 범위', () => {
+  const THREE = {
+    words: [
+      { wordId: 1, word: '가격', difficultyLevel: 1, category: 'SAVINGS' as const },
+      { wordId: 2, word: '금리', difficultyLevel: 3, category: 'SAVINGS' as const },
+      { wordId: 3, word: '나눔', difficultyLevel: 1, category: 'SAVINGS' as const },
+    ],
+    page: 0,
+    totalPages: 1,
+  };
+
+  beforeEach(() => {
+    jest.mocked(wordApi.getWords).mockResolvedValue(THREE);
+    jest.mocked(wordApi.getWord).mockImplementation((wordId) =>
+      Promise.resolve({
+        ...THREE.words.find((w) => w.wordId === wordId)!,
+        definition: '뜻',
+        easyDefinition: null,
+      }),
+    );
+  });
+
+  it('난이도 필터를 넘겨받으면 그 범위 안에서만 이동한다', async () => {
+    // 목록에서 초급(가격·나눔)만 보다 들어왔다 — 중급인 금리를 건너뛰어야 한다
+    await show({ wordId: 1, category: 'SAVINGS', difficulty: 'BEGINNER' });
+    await screen.findByText('가격');
+
+    fireEvent.press(screen.getByLabelText('다음 단어'));
+
+    expect(await screen.findByText('나눔')).toBeTruthy();
+  });
+
+  it('필터가 없으면 그 카테고리 전체를 돈다', async () => {
+    await show({ wordId: 1, category: 'SAVINGS' });
+    await screen.findByText('가격');
+
+    fireEvent.press(screen.getByLabelText('다음 단어'));
+
+    expect(await screen.findByText('금리')).toBeTruthy();
+  });
 });
