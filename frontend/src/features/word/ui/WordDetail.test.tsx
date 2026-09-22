@@ -54,7 +54,8 @@ beforeEach(() => {
 it('다음 단어는 목록에 보이는 가나다 순서를 따른다 — db 저장 순서가 아니다', async () => {
   await show({ wordId: 2 }); // 가계부 (가나다 첫 번째, id 는 마지막)
 
-  fireEvent.press(await screen.findByText('다음 단어 →'));
+  // 버튼에 글자가 없다 — 화살표만 있고 라벨은 스크린리더용이다
+  fireEvent.press(await screen.findByLabelText('다음 단어'));
 
   expect(await screen.findByText('적금')).toBeTruthy();
 });
@@ -80,4 +81,14 @@ it('쉬운 설명이 아직 없는 단어는 그 블록을 빼고 뜻만 보여�
 
   expect(await screen.findByText('수입·지출 기록장')).toBeTruthy();
   expect(screen.queryByText('쉽게 말하면')).toBeNull();
+});
+
+it('이웃이 없으면 이전/다음 버튼이 눌리지 않는다', async () => {
+  // 검색 결과에서 바로 들어오면 목록 순서를 몰라서 이동할 곳이 없다
+  jest.mocked(wordApi.getWords).mockResolvedValue({ words: [], page: 0, totalPages: 1 });
+  await show({ wordId: 1 });
+  await screen.findByText('적금');
+
+  expect(screen.getByLabelText('이전 단어').props.accessibilityState?.disabled).toBe(true);
+  expect(screen.getByLabelText('다음 단어').props.accessibilityState?.disabled).toBe(true);
 });

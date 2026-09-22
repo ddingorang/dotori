@@ -1,6 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { wordApi } from '@/features/word/api/wordApi';
 import { categoryLabel } from '@/features/word/lib/categoryLabel';
@@ -13,7 +14,7 @@ import { useWords } from '@/features/word/model/useWords';
 import type { WordCategory } from '@/features/word/model/types';
 import { wordKeys } from '@/features/word/model/wordKeys';
 import { useTheme } from '@/shared/theme';
-import { Button, Header } from '@/shared/ui';
+import { Header } from '@/shared/ui';
 
 type WordDetailProps = {
   wordId: number;
@@ -154,20 +155,16 @@ export function WordDetail({ wordId: initialWordId, category, onBack: goBack }: 
 
         <EasyDefinitionBubble easyDefinition={word.easyDefinition} />
 
-        <View style={[styles.navRow, { gap: theme.space.sm }]}>
-          <Button
-            label="← 이전 단어"
-            variant="outline"
-            size="sm"
-            style={styles.flexItem}
+        {/* 글자 없이 화살표만 둔다. 이동 방향은 화살표로 이미 분명하고, 이 화면의 주인공은
+            단어와 뜻이라 버튼이 가로폭을 다 먹을 이유가 없다. 라벨은 스크린리더에만 준다. */}
+        <View style={[styles.navRow, { gap: theme.space.lg }]}>
+          <NeighborButton
+            direction="prev"
             disabled={!hasNeighbor}
             onPress={() => goToNeighbor(-1)}
           />
-          <Button
-            label="다음 단어 →"
-            variant="outline"
-            size="sm"
-            style={styles.flexItem}
+          <NeighborButton
+            direction="next"
             disabled={!hasNeighbor}
             onPress={() => goToNeighbor(1)}
           />
@@ -177,11 +174,56 @@ export function WordDetail({ wordId: initialWordId, category, onBack: goBack }: 
   );
 }
 
+/** 이전/다음 단어로 가는 원형 버튼. 이웃이 없으면 흐리게 두고 누르지 못하게 한다 */
+function NeighborButton({
+  direction,
+  disabled,
+  onPress,
+}: {
+  direction: 'prev' | 'next';
+  disabled: boolean;
+  onPress: () => void;
+}) {
+  const theme = useTheme();
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={direction === 'prev' ? '이전 단어' : '다음 단어'}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.navButton,
+        {
+          backgroundColor: disabled
+            ? theme.color.background.surfaceSunken
+            : theme.color.brand.solid,
+          opacity: pressed ? 0.7 : 1,
+        },
+      ]}
+    >
+      <Ionicons
+        name={direction === 'prev' ? 'arrow-back' : 'arrow-forward'}
+        size={22}
+        color={disabled ? theme.color.text.muted : theme.color.text.onBrand}
+      />
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  flexItem: { flex: 1 },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   badgeRow: { flexDirection: 'row' },
   badge: { paddingHorizontal: 10, paddingVertical: 4 },
-  navRow: { flexDirection: 'row', marginTop: 8 },
+  navRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 16 },
+  // 48은 손가락이 편히 닿는 최소 크기다. radius 는 절반이라야 정원이 된다
+  navButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
