@@ -236,9 +236,9 @@ const styles = StyleSheet.create({
   // radius 는 지름의 절반이라야 정원이 된다. 48이 손가락이 닿는 최소치이고 여기서는
   // 화면 아래에 홀로 있는 버튼이라 그보다 넉넉히 준다
   navButton: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     alignItems: 'center',
     justifyContent: 'center',
   },
