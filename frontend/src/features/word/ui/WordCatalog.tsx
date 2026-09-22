@@ -3,11 +3,16 @@ import { router } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, SectionList, StyleSheet, Text, View } from 'react-native';
 
+import { difficultyTier } from '@/features/word/lib/difficultyTier';
 import { groupByChosung, type WordCategoryFilter } from '@/features/word/lib/wordSearch';
 import { useWords } from '@/features/word/model/useWords';
 import { useWordSearch } from '@/features/word/model/useWordSearch';
 import type { WordCategory, WordListItem } from '@/features/word/model/types';
 import { CategoryFilterBar } from '@/features/word/ui/CategoryFilterBar';
+import {
+  DifficultyFilterBar,
+  type WordDifficultyFilterKey,
+} from '@/features/word/ui/DifficultyFilterBar';
 import { ChosungIndexRail } from '@/features/word/ui/ChosungIndexRail';
 import { WordListRow } from '@/features/word/ui/WordListRow';
 import { useTheme } from '@/shared/theme';
@@ -45,6 +50,7 @@ export function WordCatalog({ onSelectWord }: WordCatalogProps) {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [category, setCategory] = useState<WordCategoryFilter>('ALL');
+  const [difficulty, setDifficulty] = useState<WordDifficultyFilterKey>('ALL');
 
   useEffect(() => {
     const id = setTimeout(() => setDebouncedQuery(query.trim()), SEARCH_DEBOUNCE_MS);
@@ -66,9 +72,38 @@ export function WordCatalog({ onSelectWord }: WordCatalogProps) {
     () => loadedBrowseWords.filter((w) => w.word.includes(debouncedQuery)),
     [loadedBrowseWords, debouncedQuery],
   );
-  const words: WordListItem[] = useMemo(
+  // 난이도 필터를 걸기 전의 목록. 칩에 보여줄 건수를 이걸로 센다 — 이미 걸러진 것을 세면
+  // 지금 고른 칩만 0이 아닌 숫자가 되어 다른 칩이 전부 비어 보인다.
+  const unfiltered: WordListItem[] = useMemo(
     () => (isSearching ? (search.data ?? interimMatches) : loadedBrowseWords),
     [isSearching, search.data, interimMatches, loadedBrowseWords],
+  );
+  const difficultyCounts = useMemo(() => {
+    const counts: Record<WordDifficultyFilterKey, number> = {
+      ALL: unfiltered.length,
+      BEGINNER: 0,
+      INTERMEDIATE: 0,
+      ADVANCED: 0,
+    };
+    for (const word of unfiltered) {
+      counts[difficultyTier(word.difficultyLevel)] += 1;
+    }
+    return counts;
+  }, [unfiltered]);
+
+  // 카테고리를 바꿨더니 고른 난이도가 0건이 되는 조합이 있다(경제×초급 등). 그때는 고른 값을
+  // 되돌리는 대신 이 파생값만 전체로 본다 — 카테고리를 되돌리면 원래 고르던 난이도가 살아난다.
+  const effectiveDifficulty: WordDifficultyFilterKey =
+    difficulty !== 'ALL' && difficultyCounts[difficulty] === 0 ? 'ALL' : difficulty;
+
+  // 검색 응답에도 난이도는 있어서(WordSearchSummary) 이 필터는 검색 중에도 그대로 돈다 —
+  // 카테고리 필터와 달리 비활성화하지 않는다.
+  const words: WordListItem[] = useMemo(
+    () =>
+      effectiveDifficulty === 'ALL'
+        ? unfiltered
+        : unfiltered.filter((w) => difficultyTier(w.difficultyLevel) === effectiveDifficulty),
+    [unfiltered, effectiveDifficulty],
   );
   const isPending = isSearching
     ? search.isPending && interimMatches.length === 0
@@ -134,6 +169,11 @@ export function WordCatalog({ onSelectWord }: WordCatalogProps) {
           }
         />
         <CategoryFilterBar selected={category} onSelect={setCategory} disabled={isSearching} />
+        <DifficultyFilterBar
+          selected={effectiveDifficulty}
+          onSelect={setDifficulty}
+          counts={difficultyCounts}
+        />
       </View>
 
       <View style={styles.body}>
@@ -191,7 +231,9 @@ export function WordCatalog({ onSelectWord }: WordCatalogProps) {
                     ? '단어를 불러오지 못했어요.'
                     : query
                       ? `"${query}"에 맞는 단어가 없어요.`
-                      : '표시할 단어가 없어요.'}
+                      : effectiveDifficulty !== 'ALL'
+                        ? '이 난이도에 맞는 단어가 없어요.'
+                        : '표시할 단어가 없어요.'}
               </Text>
             </View>
           }

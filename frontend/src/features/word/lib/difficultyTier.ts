@@ -8,6 +8,13 @@ const TIER_LABELS: Record<DifficultyTier, string> = {
   ADVANCED: '고급',
 };
 
+/** 필터 칩이 쉬운 것부터 늘어놓을 순서 */
+export const TIER_ORDER: DifficultyTier[] = ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'];
+
+export function tierLabel(tier: DifficultyTier): string {
+  return TIER_LABELS[tier];
+}
+
 /**
  * words.difficulty_level(1~4) → 난이도 구간. AI 서버 `app/domains/quiz/services.py`의
  * `TIER_TO_DIFFICULTY`(1→BEGINNER, 2~3→INTERMEDIATE, 4→ADVANCED)와 값을 맞췄다 — 두 곳이
