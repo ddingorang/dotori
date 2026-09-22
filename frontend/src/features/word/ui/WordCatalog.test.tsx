@@ -187,3 +187,47 @@ describe('난이도 필터', () => {
     expect(screen.getByText('기준금리')).toBeTruthy();
   });
 });
+
+it('초성 인덱스가 아직 안 그려진 아래쪽 구간으로도 점프한다', async () => {
+  // 목록을 일부만 들고 있으면 뒤쪽 초성이 아예 비활성이고(present 에 없음),
+  // getItemLayout 이 없으면 활성이어도 점프가 조용히 실패한다 — 둘 다 막는다.
+  jest.mocked(wordApi.getWords).mockResolvedValue({
+    words: [
+      { wordId: 1, word: '가격', difficultyLevel: 1, category: 'CONSUMPTION' },
+      { wordId: 2, word: '환율', difficultyLevel: 4, category: 'ECONOMY' },
+    ],
+    page: 0,
+    totalPages: 1,
+  });
+  await show();
+  await screen.findByText('가격');
+
+  // 'ㅎ'(환율)이 눌리는 상태여야 한다 — 목록 끝까지 들고 있다는 뜻이다
+  const rail = screen.getByLabelText('ㅎ으로 이동');
+  expect(rail.props.accessibilityState?.disabled).not.toBe(true);
+
+  fireEvent.press(rail);
+
+  expect(screen.getByText('환율')).toBeTruthy();
+});
+
+it('남은 페이지가 있으면 스크롤 없이 이어 받는다 — 초성 인덱스가 전체를 알아야 한다', async () => {
+  jest
+    .mocked(wordApi.getWords)
+    .mockResolvedValueOnce({
+      words: [{ wordId: 1, word: '가격', difficultyLevel: 1, category: 'CONSUMPTION' }],
+      page: 0,
+      totalPages: 2,
+    })
+    .mockResolvedValueOnce({
+      words: [{ wordId: 2, word: '환율', difficultyLevel: 4, category: 'ECONOMY' }],
+      page: 1,
+      totalPages: 2,
+    });
+
+  await show();
+
+  // 스크롤(onEndReached) 없이도 2페이지가 따라 들어와야 한다
+  expect(await screen.findByText('환율')).toBeTruthy();
+  expect(wordApi.getWords).toHaveBeenCalledTimes(2);
+});

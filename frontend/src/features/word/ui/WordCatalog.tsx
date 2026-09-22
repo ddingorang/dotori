@@ -14,12 +14,15 @@ import {
   type WordDifficultyFilterKey,
 } from '@/features/word/ui/DifficultyFilterBar';
 import { ChosungIndexRail } from '@/features/word/ui/ChosungIndexRail';
-import { WordListRow } from '@/features/word/ui/WordListRow';
+import { WordListRow, WORD_ROW_HEIGHT } from '@/features/word/ui/WordListRow';
 import { useTheme } from '@/shared/theme';
 import { Header, Input, Screen, usePullToRefresh } from '@/shared/ui';
 
 /** 입력이 멈추고 이 시간(ms)이 지나야 검색 API를 부른다. 타이핑마다 매번 부르면 낭비다. */
 const SEARCH_DEBOUNCE_MS = 300;
+
+/** 초성 헤더 높이(px). 아래 renderSectionHeader 가 이 값을 그대로 height 로 쓴다. */
+const SECTION_HEADER_HEIGHT = 30;
 
 type WordCatalogProps = {
   /**
@@ -116,6 +119,36 @@ export function WordCatalog({ onSelectWord }: WordCatalogProps) {
   );
   const presentChosung = useMemo(() => new Set(sections.map((s) => s.title)), [sections]);
 
+  /**
+   * `scrollToLocation` 이 쓸 평탄화 인덱스별 위치표.
+   *
+   * <p>이게 없으면 아직 화면에 그려진 적 없는 구간으로는 점프가 조용히 실패한다 —
+   * VirtualizedList 는 재어 본 적 있는 행까지만 위치를 알고, 모르는 곳으로 가라고 하면
+   * onScrollToIndexFailed 로 빠진다. 위에서 몇 개는 되고 아래쪽 초성은 안 먹히던 증상이
+   * 이것이다.
+   *
+   * <p>SectionList 의 평탄화 순서는 섹션마다 [헤더, 항목…, 푸터] 다. 푸터를 그리지 않아도
+   * 자리는 세므로 길이 0으로 같이 넣는다.
+   */
+  const itemLayouts = useMemo(() => {
+    const layouts: { length: number; offset: number; index: number }[] = [];
+    let offset = 0;
+    let index = 0;
+    const push = (length: number) => {
+      layouts.push({ length, offset, index });
+      offset += length;
+      index += 1;
+    };
+    for (const section of sections) {
+      push(SECTION_HEADER_HEIGHT);
+      for (let i = 0; i < section.data.length; i += 1) {
+        push(WORD_ROW_HEIGHT);
+      }
+      push(0);
+    }
+    return layouts;
+  }, [sections]);
+
   const jumpToChosung = (chosung: string) => {
     const sectionIndex = sections.findIndex((s) => s.title === chosung);
     if (sectionIndex === -1) return;
@@ -195,11 +228,10 @@ export function WordCatalog({ onSelectWord }: WordCatalogProps) {
             <Text
               style={[
                 theme.typography.label,
+                styles.sectionHeader,
                 {
                   color: theme.color.brand.subtleText,
                   backgroundColor: theme.color.background.canvas,
-                  paddingTop: theme.space.sm,
-                  paddingBottom: theme.space.xs,
                 },
               ]}
             >
@@ -207,6 +239,7 @@ export function WordCatalog({ onSelectWord }: WordCatalogProps) {
             </Text>
           )}
           stickySectionHeadersEnabled
+          getItemLayout={(_data, index) => itemLayouts[index] ?? { length: 0, offset: 0, index }}
           contentContainerStyle={{
             paddingHorizontal: theme.layout.screenX,
             paddingBottom: theme.space['3xl'],
@@ -247,6 +280,8 @@ export function WordCatalog({ onSelectWord }: WordCatalogProps) {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  // getItemLayout 이 이 높이를 그대로 쓴다 — 여기를 고치면 SECTION_HEADER_HEIGHT 도 같이 고친다
+  sectionHeader: { height: SECTION_HEADER_HEIGHT, textAlignVertical: 'center' },
   body: { flex: 1, flexDirection: 'row' },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 40 },
 });
