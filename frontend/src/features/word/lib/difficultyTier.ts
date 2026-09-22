@@ -30,14 +30,37 @@ export function difficultyLabel(level: number): string {
   return TIER_LABELS[difficultyTier(level)];
 }
 
-/** 난이도 배지 색 — 시맨틱 톤온톤(success/warning/danger)으로 "쉬움→위험"이 읽히게 한다. */
-export function difficultyBadgeColors(theme: Theme, level: number): { bg: string; text: string } {
-  switch (difficultyTier(level)) {
+/**
+ * 난이도별 색 한 벌 — 시맨틱 톤온톤(success/warning/danger)으로 "쉬움→위험"이 읽히게 한다.
+ * 상세의 배지와 목록의 필터 칩이 같은 색을 써야 아이가 둘을 같은 것으로 알아본다.
+ */
+export function difficultyTierColors(
+  theme: Theme,
+  tier: DifficultyTier,
+): { bg: string; text: string; solid: string } {
+  switch (tier) {
     case 'BEGINNER':
-      return { bg: theme.color.status.success.subtle, text: theme.color.status.success.text };
+      return {
+        bg: theme.color.status.success.subtle,
+        text: theme.color.status.success.text,
+        solid: theme.color.status.success.solid,
+      };
     case 'INTERMEDIATE':
-      return { bg: theme.color.status.warning.subtle, text: theme.color.status.warning.text };
+      return {
+        bg: theme.color.status.warning.subtle,
+        text: theme.color.status.warning.text,
+        solid: theme.color.status.warning.solid,
+      };
     case 'ADVANCED':
-      return { bg: theme.color.status.danger.subtle, text: theme.color.status.danger.text };
+      return {
+        bg: theme.color.status.danger.subtle,
+        text: theme.color.status.danger.text,
+        solid: theme.color.status.danger.solid,
+      };
   }
+}
+
+/** 난이도 배지 색. `difficulty_level`(1~4)을 구간으로 접어 위 색을 고른다. */
+export function difficultyBadgeColors(theme: Theme, level: number): { bg: string; text: string } {
+  return difficultyTierColors(theme, difficultyTier(level));
 }
