@@ -149,6 +149,15 @@ flowchart TD
   - 포인트 거래 내역: 충전, 보상, 구매, 저축, 투자 등 유형별 조회
   - 부모도 자녀의 포인트 잔액과 거래 내역 열람 가능
 
+<table>
+  <tr>
+    <td align="center"><img src="docs/images/readme/screens/wallet-home.jpg" width="170" alt="도토리 지갑" /><br/><sub>도토리 지갑</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/wallet-charge.jpg" width="170" alt="포인트 충전" /><br/><sub>포인트 충전</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/wallet-cashout.jpg" width="170" alt="환전 요청" /><br/><sub>환전 요청</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/wallet-cashout-history.jpg" width="170" alt="환전 내역" /><br/><sub>환전 내역</sub></td>
+  </tr>
+</table>
+
 ### 🧹 미션
 
 - 부모가 자녀별 할 일 등록 (한 번, 매일, 매주, 매월 반복)
@@ -156,12 +165,30 @@ flowchart TD
 - 아이가 사진으로 완료 인증 요청 → 부모 승인 시 포인트 지급, 거절 가능
 - 완료 내역은 실제 지급액 기준으로 기록 (보상을 나중에 바꿔도 과거 이력 유지)
 
+<table>
+  <tr>
+    <td align="center"><img src="docs/images/readme/screens/mission-register.jpg" width="170" alt="미션 등록 (AI 보상 책정)" /><br/><sub>미션 등록 (AI 보상 책정)</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/mission-proof.jpg" width="170" alt="사진으로 완료 인증" /><br/><sub>사진으로 완료 인증</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/mission-approve.jpg" width="170" alt="부모 승인과 거절" /><br/><sub>부모 승인과 거절</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/mission-list.jpg" width="170" alt="미션 목록" /><br/><sub>미션 목록</sub></td>
+  </tr>
+</table>
+
 ### 🏪 상점
 
 - 부모가 아이를 위한 상품 등록
 - AI가 상품 가치와 가족 소득 수준을 바탕으로 포인트 가격 책정
 - 아이가 보유 포인트로 즉시 구매 (구매 후 별도 승인 없이 바로 차감)
 - 구매 내역 조회로 소비 선택과 잔액 변화 확인
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/images/readme/screens/store-list.jpg" width="170" alt="우리 가족 상점" /><br/><sub>우리 가족 상점</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/store-register.jpg" width="170" alt="상품 등록 (AI 가격 책정)" /><br/><sub>상품 등록 (AI 가격 책정)</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/store-detail.jpg" width="170" alt="상품 상세" /><br/><sub>상품 상세</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/store-purchased.jpg" width="170" alt="구매 완료" /><br/><sub>구매 완료</sub></td>
+  </tr>
+</table>
 
 ### 🏦 예적금
 
@@ -173,12 +200,30 @@ flowchart TD
 - 만기 예상 수령액과 지금 해지 시 수령액 비교
 - 적금 납입 리마인더 알림
 
+<table>
+  <tr>
+    <td align="center"><img src="docs/images/readme/screens/saving-list.jpg" width="170" alt="예적금 상품 목록" /><br/><sub>예적금 상품 목록</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/saving-deposit.jpg" width="170" alt="예금 가입" /><br/><sub>예금 가입</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/saving-goal.jpg" width="170" alt="적금 진행 현황" /><br/><sub>적금 진행 현황</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/saving-holdings.jpg" width="170" alt="보유 예적금" /><br/><sub>보유 예적금</sub></td>
+  </tr>
+</table>
+
 ### 📈 투자
 
 - 매일 AI가 가상 기업 뉴스 생성 → 다음 날 뉴스 내용에 따라 종목 가격 변동
 - 가족별 독립 시세, 종목당 1주 매수와 매도
 - 보유 종목, 거래 내역, 가격 이력 조회
 - 뉴스 리뷰로 가격이 오르내린 이유 복습
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/images/readme/screens/invest-home.jpg" width="170" alt="오늘의 투자" /><br/><sub>오늘의 투자</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/invest-news.jpg" width="170" alt="AI 생성 뉴스" /><br/><sub>AI 생성 뉴스</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/invest-detail.jpg" width="170" alt="종목 상세와 가격 추이" /><br/><sub>종목 상세와 가격 추이</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/invest-review.jpg" width="170" alt="지난 뉴스 해설" /><br/><sub>지난 뉴스 해설</sub></td>
+  </tr>
+</table>
 
 ### 📝 퀴즈
 
@@ -187,12 +232,30 @@ flowchart TD
 - 부모는 정답과 아이의 제출 내역 확인
 - 경제 단어장: 금융 용어 검색과 쉬운 설명
 
+<table>
+  <tr>
+    <td align="center"><img src="docs/images/readme/screens/quiz-question.jpg" width="170" alt="오늘의 경제 퀴즈" /><br/><sub>오늘의 경제 퀴즈</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/quiz-correct.jpg" width="170" alt="정답과 보상" /><br/><sub>정답과 보상</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/word-list.jpg" width="170" alt="경제 단어장" /><br/><sub>경제 단어장</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/word-detail.jpg" width="170" alt="쉬운 설명" /><br/><sub>쉬운 설명</sub></td>
+  </tr>
+</table>
+
 ### 공통 기반
 
 - 가족 연결: 부모가 가족 생성, 초대 코드로 아이 연결, 가족 단위 권한 분리
 - 온보딩 설정: 주간 용돈, 주간 보상 한도, 금융 지식 수준 (AI 가격, 보상, 퀴즈 난이도의 기준)
 - 리포트: 자녀의 수입, 소비, 자산 리포트
 - 알림: FCM 푸시와 알림 센터 (하루 시작 알림, 승인 요청, 납입 리마인더 등)
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/images/readme/screens/onboarding-role.jpg" width="170" alt="역할 선택" /><br/><sub>역할 선택</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/onboarding-invite-code.jpg" width="170" alt="자녀 초대 코드" /><br/><sub>자녀 초대 코드</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/report.jpg" width="170" alt="자산 리포트" /><br/><sub>자산 리포트</sub></td>
+    <td align="center"><img src="docs/images/readme/screens/notifications.jpg" width="170" alt="알림 센터" /><br/><sub>알림 센터</sub></td>
+  </tr>
+</table>
 
 ## 개발 단계별 범위
 
@@ -202,28 +265,6 @@ flowchart TD
 | **2차 — 주요 경제활동** | 돈을 벌고 모으고 쓰는 과정 구현 | 소득, 소비, 예적금, 상점 |
 | **2.5차 — 금융 경험 확장** | 선택과 학습 영역 확장 | 가상 투자, 금융 퀴즈, 금융 단어장 |
 | **3차 — 서비스 고도화** | 활동 결과를 이해하고 지속하도록 지원 | AI 경제 설계, 주간 정산, 부모 리포트, 알림, 사용성 개선 및 이슈 해결 |
-
-<!--
-실제 화면이 준비되면 아래와 같은 구성을 추가합니다.
-
-## 서비스 화면
-
-| 부모 홈 | 아이 홈 | 도토리 지갑 |
-| --- | --- | --- |
-| 이미지 | 이미지 | 이미지 |
-
-| 예적금 | 우리 집 상점 | 투자, 퀴즈 |
-| --- | --- | --- |
-| 이미지 | 이미지 | 이미지 |
-
-권장 경로:
-- docs/images/readme/screen-parent-home.png
-- docs/images/readme/screen-child-home.png
-- docs/images/readme/screen-wallet.png
-- docs/images/readme/screen-saving.png
-- docs/images/readme/screen-store.png
-- docs/images/readme/screen-learning.png
--->
 
 ## 시스템 구성
 
